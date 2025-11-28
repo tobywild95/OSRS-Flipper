@@ -95,6 +95,16 @@ tr:hover td {
 	background: #505050;
 }
 
+/* unvisited link */
+a:link {
+  color: white;
+}
+
+/* visited link */
+a:visited {
+  color: #888;
+}
+
 /* Firefox */
 * {
 	scrollbar-width: thin;
@@ -113,6 +123,7 @@ tr:hover td {
 			<th>Low | High</th>
 			<th>Profit</th>
 			<th>Cost</th>
+      <th>Links</th>
 		</tr>
 	</table>
 </div>
@@ -161,6 +172,7 @@ function updateTable(data) {
 		var lowHighCell = tableRow.insertCell(1);
 		var profitCell = tableRow.insertCell(2);
 		var costCell = tableRow.insertCell(3);
+    var linksCell = tableRow.insertCell(4);
     var styleToUse = "";
 
 		itemCell.innerHTML =
@@ -178,7 +190,10 @@ function updateTable(data) {
 			window.OSRS.library.numberWithCommas(row.priceData.high) +
 			"</span> | <span class='greyText'>" +
 			row.calcData.buySellRatio +
-			"</span>";
+			"</span>" +
+      "<br><span class='smallText'>" +
+      row.calcData.tax;
+      "</span>";
 
     if(row.calcData.profit > 0)
     {
@@ -202,6 +217,11 @@ function updateTable(data) {
 			window.OSRS.library.numberWithCommas(row.calcData.totalCostMillion) +
 			"m</span>"+
       "</span>";
+    linksCell.innerHTML = 
+    "<a href='https://www.ge-tracker.com/item/" + row.calcData.geTrackerId +
+    "' target=\"_blank\" >GE Tracker</a><br>"+
+    "<a href='https://oldschool.runescape.wiki/w/" + row.calcData.wikiId +
+    "' target=\"_blank\" >Wiki</a><br>"
 	}
 }
 </script>

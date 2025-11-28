@@ -172,5 +172,13 @@ function getCalculatedData(result, natureRune)
 		calcData.buySellRatio = 0;
 	}
 
+	calcData.geTrackerId = result.itemData.name
+	.toLowerCase()
+	.replace(/[^a-z0-9]+/g, '-')
+	.replace(/^-+|-+$/g, '');
+
+	calcData.wikiId = result.itemData.name
+	.replace(/\s+/g, '_');
+
 	return calcData;
 }
