@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {font-family: Arial;}
+</style>
+</head>
+<body>
+
+<div id="London" class="tabcontent">
+  <h3>London</h3>
+  <p>London is the capital of England.</p>
+</div>
+
+<script>
+    window.beans = beans
+    function beans(){console.log("Bean me up")}
+
+    window.addEventListener('message', receiver, false);
+    function receiver(e) {
+    console.log(e)
+    beans()
+    }
+</script>
+</body>
+</html> 

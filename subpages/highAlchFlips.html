@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {font-family: Arial;}
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+</style>
+</head>
+<body>
+
+<div class="tabcontent">
+  <table id="dataTable">
+  <tr>
+    <th>Item</th>
+    <th>Low | High</th>
+    <th>Profit</th>
+    <th>Cost</th>
+  </tr>
+</div>
+
+<script src="../scripts/libraryFunctions.js"></script>
+<script>
+  console.log("ATTACHED")
+    window.addEventListener('message', receiver, false);
+
+    function receiver(e) 
+    {
+      console.log("RECEIVED")
+      console.log(e)
+      refreshData(e.data)
+    }
+
+
+  function refreshData(data)
+  {
+    clearTable()
+    updateTable(data)
+  }
+
+  function clearTable()
+  {
+    var table = document.getElementById("dataTable");
+
+    for(var i = table.rows.length - 1; i > 0; i--)
+    {
+        table.deleteRow(i);
+    }
+  }
+
+  function updateTable(data)
+  {
+    	let results = [];
+      var table = document.getElementById("dataTable");
+
+      for(var key in data.metaData.highAlchItems)
+      {
+        var result = {};
+        var resultId = data.metaData.highAlchItems[key];
+        result = data.consolidatedData[resultId];
+        result = window.OSRS.library.parseTypeName(result);
+        results.push(result);
+      }
+
+      results = results.sort(function(a, b){return b.calcData.profitPotential - a.calcData.profitPotential;})
+
+      console.log(results)
+
+      for(var i = 0; i < results.length; i++)
+      {
+        var row = results[i]
+        var tableRow = table.insertRow(i+1);
+
+        var itemCell = tableRow.insertCell(0);
+        var lowHighCell = tableRow.insertCell(1);
+        var profitCell = tableRow.insertCell(2);
+        var costCell = tableRow.insertCell(3);
+
+        itemCell.innerHTML = row.itemData.name + "<br><span class=\"greyText\">" + window.OSRS.library.numberWithCommas(row.itemData.limit) + " | Max: " + window.OSRS.library.numberWithCommas(row.calcData.guideBuy) + "</span>"
+        lowHighCell.innerHTML = ("<span class=\"deepOrangeText\">" + window.OSRS.library.numberWithCommas(row.priceData.low) + "</span> | <span class=\"blueText\">" + window.OSRS.library.numberWithCommas(row.priceData.high) + "</span> | <span class=\"greyText\">" + row.calcData.buySellRatio + "</span>")
+        profitCell.innerHTML = (row.calcData.profitText + " per</span><br>" + row.calcData.profitPotentialText)
+        costCell.innerHTML = window.OSRS.library.numberWithCommas(row.calcData.totalCost) + "<br><span class=\"greyText\">" + window.OSRS.library.numberWithCommas(row.calcData.totalCostMillion) + "m</span>"
+      }
+
+  }
+</script>
+</body>
+</html> 

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>OSRS Flipper</title>
+	<style>
+		body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #111; color: #eee; }
+		h1 { padding: 16px; margin: 0; background: #222; border-bottom: 1px solid #333; }
+		nav { display: flex; gap: 8px; padding: 12px; background: #1a1a1a; position: sticky; top: 0; }
+		button { background: #333; color: #eee; border: 1px solid #444; padding: 8px 12px; cursor: pointer; }
+		button.active { background: #555; }
+		#content { padding: 16px; }
+		table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+		table th, table td { border: 1px solid #333; padding: 8px; }
+		.orangeText { color: orange; }
+		.greenText { color: #4caf50; }
+		.redText { color: #f44336; }
+		.blueText { color: #42a5f5; }
+		.deepOrangeText { color: #ff7043; }
+		.greyText { color: #9e9e9e; }
+	</style>
+</head>
+<body>
+	<h1>OSRS Flipping Dashboard</h1>
+	<nav>
+		<button data-tab="highAlch">High Alch</button>
+		<button data-tab="sets">Sets</button>
+		<button data-tab="components">Components</button>
+		<button data-tab="favourites">Favourites</button>
+		<button data-tab="profit">Top Profit</button>
+		<button data-tab="margin">Top Margin</button>
+	</nav>
+	<div id="content">Loading...</div>
+
+	<script>
+		// --- CONFIG FROM OBSIDIAN ---
+		const META = {
+			natureRuneId: 561,
+			highAlchItems: {"Maple longbow":851,"Sapphire necklace":1656,"Emerald necklace":1658,"Rune arrow":892,"Runite bolts":9144,"Yew longbow":855,"Yew shortbow":857,"Amethyst arrow":21326,"Atlatl dart":28991,"Magic shortbow":861,"Magic longbow":859,"Diamond bracelet":11092,"Jade bracelet":21120,"Rune dart":811,"Diamond bolts (e)":9243},
+			setItems: {"Ahrim's armour set":{"id":12881,"components":[4708,4712,4714,4710]},"Dharok's armour set":{"id":12877,"components":[4718,4716,4720,4722]},"Dwarf cannon set":{"id":12863,"components":[10,6,12,8]}},
+			combineItems: {"Bandos godsword":{"id":11804,"components":[11812,11798]},"Saradomin godsword":{"id":11806,"components":[11814,11798]},"Zamorak godsword":{"id":11808,"components":[11816,11798]},"Ancient godsword":{"id":26233,"components":[26370,11798]},"Armadyl godsword":{"id":11802,"components":[11810,11798]},"Burning claws":{"id":29577,"components":[29574,29574]},"Voidwaker":{"id":27690,"components":[27684,27687,27681]}},
+			favouriteItems: {"Amulet of fury":6585,"Chaos rune":562,"Ranarr seed":5295,"Ranarr weed":257,"Snape grass seed":22879,"Kwuarm seed":5299,"Adamant arrow":890,"Gold ore":444,"Law rune":563,"Berserker necklace":11128,"Berserker ring":6737,"Archer helm":3749,"Adamant dart":810,"Dark crab":11936,"Black chinchompa":11959,"Mahogany logs":6332}
+		};
+
+		// --- SIMPLE FETCH HELPERS ---
+		async function fetchJSON(url) { return (await fetch(url)).json(); }
+
+		function commas(x) { return x?.toString().replace(/\B(?=(\d{3})+(?!\d))/g,",") ?? "0"; }
+		function pos(x){return `<span class='greenText'>${commas(x)}</span>`}
+		function neg(x){return `<span class='redText'>${commas(x)}</span>`}
+		function colorProfit(x){return x>=0?pos(x):neg(x)}
+
+		// --- CORE DATA ---
+		let DATA = { consolidated:{}, sortable:[] };
+
+		async function loadAllData(){
+			const prices = (await fetchJSON("https://prices.runescape.wiki/api/v1/osrs/latest")).data;
+			const items = await fetchJSON("https://prices.runescape.wiki/api/v1/osrs/mapping");
+			const qty = (await fetchJSON("https://prices.runescape.wiki/api/v1/osrs/1h")).data;
+
+			for(const id in prices){
+				const p = prices[id];
+				const q = qty[id] || null;
+				const item = items.find(r=>r.id==id);
+				if(!item) continue;
+
+				let limit = item.limit ?? q?.lowPriceVolume ?? q?.highPriceVolume ?? 1;
+				let profit = (p.high - p.low) - Math.floor(p.high*0.01);
+				let profitPotential = profit * limit;
+
+				DATA.consolidated[id] = {price:p, qty:q, item:{...item,limit}, calc:{profit,profitPotential}};
+				DATA.sortable.push({id:id,profit,profitPotential,limit});
+			}
+		}
+
+		// --- DISPLAY COMPONENTS ---
+		function table(headers, rows){
+			return `<table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+		}
+
+		function renderHighAlch(){
+			const rows=[];
+			for(const name in META.highAlchItems){
+				const id=META.highAlchItems[name];
+				const d=DATA.consolidated[id];
+				if(!d) continue;
+				rows.push([
+					d.item.name+`<br><span class='greyText'>Limit: ${commas(d.item.limit)}</span>`,
+					`<span class='deepOrangeText'>${commas(d.price.low)}</span> | <span class='blueText'>${commas(d.price.high)}</span>`,
+					colorProfit(d.calc.profit),
+					commas(d.price.low*d.item.limit)
+				]);
+			}
+			return table(["Item","Low | High","Profit","Cost"],rows);
+		}
+
+		function renderBasicList(source){
+			const rows=[];
+			for(const name in source){
+				const id = source[name];
+				const d=DATA.consolidated[id];
+				if(!d) continue;
+				rows.push([
+					d.item.name,
+					`${commas(d.price.low)} | ${commas(d.price.high)}`,
+					colorProfit(d.calc.profit),
+					commas(d.price.low*d.item.limit)
+				]);
+			}
+			return table(["Item","Low/High","Profit","Cost"],rows);
+		}
+
+		function renderTop(type){
+			const sorted=[...DATA.sortable].sort((a,b)=>b[type]-a[type]).slice(0,50);
+			const rows=[];
+			for(const r of sorted){
+				const d=DATA.consolidated[r.id];
+				if(!d) continue;
+				rows.push([
+					d.item.name,
+					`${commas(d.price.low)} | ${commas(d.price.high)}`,
+					colorProfit(d.calc.profit),
+					commas(d.price.low*d.item.limit)
+				]);
+			}
+			return table(["Item","Low/High","Profit","Cost"],rows);
+		}
+
+		// --- ROUTER ---
+		async function init(){
+			document.querySelector('#content').innerHTML="Loading data...";
+			await loadAllData();
+			switchTab('highAlch');
+		}
+
+		function switchTab(tab){
+			document.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+			document.querySelector(`button[data-tab="${tab}"]`).classList.add('active');
+
+			let html="";
+			if(tab==='highAlch') html=renderHighAlch();
+			if(tab==='sets') html=renderBasicList(META.setItems);
+			if(tab==='components') html=renderBasicList(META.combineItems);
+			if(tab==='favourites') html=renderBasicList(META.favouriteItems);
+			if(tab==='profit') html=renderTop('profitPotential');
+			if(tab==='margin') html=renderTop('profit');
+
+			document.querySelector('#content').innerHTML=html;
+		}
+
+		document.querySelectorAll('button').forEach(b=>{
+			b.addEventListener('click',()=>switchTab(b.dataset.tab));
+		});
+
+		init();
+	</script>
+</body>
+</html>

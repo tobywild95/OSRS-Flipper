@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+/* ===== Base ===== */
+body {
+	font-family: Arial, sans-serif;
+	margin: 0;
+	padding: 0;
+	background-color: #1e1e1e;
+	color: #ddd;
+}
+
+/* ===== Tabs ===== */
+.tab {
+	display: flex;
+	border-bottom: 1px solid #333;
+	background-color: #2b2b2b;
+}
+
+.tab button {
+	background: none;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	padding: 12px 18px;
+	font-size: 16px;
+	color: #bbb;
+	transition: background-color 0.2s, color 0.2s;
+}
+
+.tab button:hover {
+	background-color: #3b3b3b;
+	color: #fff;
+}
+
+.tab button.active {
+	background-color: #444;
+	color: #fff;
+	border-bottom: 2px solid #6da9ff;
+}
+
+/* ===== Content Area ===== */
+.tabcontent {
+	display: none;
+	height: calc(100vh - 50px);
+	border-top: none;
+	background-color: #1e1e1e;
+	padding: 0;
+}
+
+/* ===== Iframe ===== */
+iframe {
+	margin: 0;
+	padding: 0;
+	border: none;
+	width: 100%;
+	height: 100%;
+	background: #1e1e1e;
+}
+
+/* ===== Loader ===== */
+.loader {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	display: inline-grid;
+	font-size: 200px;
+	color: #6da9ff;
+}
+
+.loader:before,
+.loader:after {
+	content: "💰";
+	grid-area: 1/1;
+}
+
+.loader:after {
+	animation: l10 1s infinite;
+}
+
+@keyframes l10 {
+	to { transform: scale(1.8); opacity: 0; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="loader" id="loader"></div>
+
+<div class="tab" id="tab" style="display:none;">
+	<button class="tablinks" onclick="openPage(event, 'HighAlchFlips')">HA Flips</button>
+	<button class="tablinks" onclick="openPage(event, 'HighAlch')">HA</button>
+	<button class="tablinks" onclick="openPage(event, 'Sets')">Sets</button>
+	<button class="tablinks" onclick="openPage(event, 'Components')">Components</button>
+	<button class="tablinks" onclick="openPage(event, 'Favourites')">Favourites</button>
+	<button class="tablinks" onclick="openPage(event, 'Profit')">Profit</button>
+	<button class="tablinks" onclick="openPage(event, 'Margin')">Margin</button>
+</div>
+
+<!-- ===== Tab Content ===== -->
+<div id="HighAlchFlips" class="tabcontent">
+	<iframe src="subpages/highAlchFlips.html" id="highAlchFlips" onload="resizeIframe(this)"></iframe>
+</div>
+
+<div id="HighAlch" class="tabcontent">
+	<iframe src="subpages/highAlch.html" id="highAlch"></iframe>
+</div>
+
+<div id="Sets" class="tabcontent">
+	<iframe src="subpages/sets.html" id="sets"></iframe>
+</div>
+
+<div id="Components" class="tabcontent">
+	<iframe src="subpages/components.html" id="components"></iframe>
+</div>
+
+<div id="Favourites" class="tabcontent">
+	<iframe src="subpages/favourites.html" id="favourites"></iframe>
+</div>
+
+<div id="Profit" class="tabcontent">
+	<iframe src="subpages/profit.html" id="profit"></iframe>
+</div>
+
+<div id="Margin" class="tabcontent">
+	<iframe src="subpages/margin.html" id="margin"></iframe>
+</div>
+
+<script src="scripts/libraryFunctions.js"></script>
+<script src="scripts/dataLoader.js"></script>
+
+<script>
+refreshData().then(() => {
+	document.getElementById('highAlchFlips')
+		.contentWindow.postMessage(window.OSRS.data, "*");
+	showPage()
+});
+
+function showPage() {
+	document.getElementById("loader").style.display = "none";
+	document.getElementById("tab").style.display = "flex";
+}
+
+function resizeIframe(obj) {
+	obj.style.height = (window.innerHeight - 60) + "px";
+}
+
+function openPage(evt, pageName) {
+	let tabcontent = document.getElementsByClassName("tabcontent");
+	for (let i = 0; i < tabcontent.length; i++) {
+		tabcontent[i].style.display = "none";
+	}
+
+	let tablinks = document.getElementsByClassName("tablinks");
+	for (let i = 0; i < tablinks.length; i++) {
+		tablinks[i].className = tablinks[i].className.replace(" active", "");
+	}
+
+	document.getElementById(pageName).style.display = "block";
+	evt.currentTarget.className += " active";
+}
+</script>
+
+</body>
+</html>
