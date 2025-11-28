@@ -39,7 +39,7 @@ body {
 .tab button.active {
 	background-color: #444;
 	color: #fff;
-	border-bottom: 2px solid #6da9ff;
+	border-bottom: 2px solid #ea6161;
 }
 
 /* ===== Content Area ===== */
@@ -85,6 +85,36 @@ iframe {
 @keyframes l10 {
 	to { transform: scale(1.8); opacity: 0; }
 }
+
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+	width: 10px;
+	height: 10px;
+	background: #1e1e1e;
+}
+
+::-webkit-scrollbar-track {
+	background: #1e1e1e;
+	border-left: 1px solid #2a2a2a;
+}
+
+::-webkit-scrollbar-thumb {
+	background: #3a3a3a;
+	border-radius: 6px;
+	border: 2px solid #1e1e1e;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: #505050;
+}
+
+/* Firefox */
+* {
+	scrollbar-width: thin;
+	scrollbar-color: #3a3a3a #1e1e1e;
+}
+
+
 </style>
 </head>
 
@@ -94,7 +124,6 @@ iframe {
 
 <div class="tab" id="tab" style="display:none;">
 	<button class="tablinks" id="haButton" onclick="openPage(event, 'HighAlchFlips')">HA Flips</button>
-	<button class="tablinks" onclick="openPage(event, 'HighAlch')">HA</button>
 	<button class="tablinks" onclick="openPage(event, 'Sets')">Sets</button>
 	<button class="tablinks" onclick="openPage(event, 'Components')">Components</button>
 	<button class="tablinks" onclick="openPage(event, 'Favourites')">Favourites</button>
@@ -106,52 +135,51 @@ iframe {
 <div id="HighAlchFlips" class="tabcontent">
 	<iframe src="subpages/highAlchFlips.html" id="highAlchFlips" onload="resizeIframe(this)"></iframe>
 </div>
-
-<div id="HighAlch" class="tabcontent">
-	<iframe src="subpages/highAlch.html" id="highAlch"></iframe>
-</div>
+ 
 
 <div id="Sets" class="tabcontent">
-	<iframe src="subpages/sets.html" id="sets"></iframe>
+	<iframe src="subpages/highAlchFlips.html" id="sets"></iframe>
 </div>
 
 <div id="Components" class="tabcontent">
-	<iframe src="subpages/components.html" id="components"></iframe>
+	<iframe src="subpages/highAlchFlips.html" id="components"></iframe>
 </div>
 
 <div id="Favourites" class="tabcontent">
-	<iframe src="subpages/favourites.html" id="favourites"></iframe>
+	<iframe src="subpages/highAlchFlips.html" id="favourites"></iframe>
 </div>
 
 <div id="Profit" class="tabcontent">
-	<iframe src="subpages/profit.html" id="profit"></iframe>
+	<iframe src="subpages/highAlchFlips.html" id="profit"></iframe>
 </div>
 
 <div id="Margin" class="tabcontent">
-	<iframe src="subpages/margin.html" id="margin"></iframe>
+	<iframe src="subpages/highAlchFlips.html" id="margin"></iframe>
 </div>
+
+
 
 <script src="scripts/libraryFunctions.js"></script>
 <script src="scripts/dataLoader.js"></script>
 
 <script>
 
-window.addEventListener("DOMContentLoaded", (event) => { 
-    refreshData().then(() => {
-        console.log("SENDING")
-        postDataToPages().then(() => {
-            console.log("SENT")
-            showPage()
-            document.getElementById("haButton").click()
-        })
-    });
-})
+window.addEventListener("DOMContentLoaded", async () => {
+	await refreshData();           // Wait for data loader
+	await waitForIframes();        // Wait for all subpages to load
+	await postDataToPages();       // Now safe to message iframes
+
+	showPage();
+	document.getElementById("haButton").click();
+});
 
 
 
-async function postDataToPages()
-{
-    document.getElementById('highAlchFlips').contentWindow.postMessage(window.OSRS.data, "*");
+async function postDataToPages() {
+	const data = window.OSRS.data;
+	document.querySelectorAll("iframe").forEach(frame => {
+		frame.contentWindow.postMessage(data, "*");
+	});
 }
 
 function showPage() {
@@ -176,6 +204,19 @@ function openPage(evt, pageName) {
 
 	document.getElementById(pageName).style.display = "block";
 	evt.currentTarget.className += " active";
+}
+
+function waitForIframes() {
+	const frames = Array.from(document.querySelectorAll("iframe"));
+	return Promise.all(
+		frames.map(frame => new Promise(resolve => {
+			if (frame.contentWindow && frame.contentDocument?.readyState === "complete") {
+				resolve();
+			} else {
+				frame.onload = () => resolve();
+			}
+		}))
+	);
 }
 </script>
 
