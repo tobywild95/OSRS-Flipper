@@ -2,26 +2,240 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
-body {font-family: Arial;}
+/* --- Base Theme --- */
+body {
+	background-color: #1e1e1e;
+	color: #e0e0e0;
+	font-family: Arial, sans-serif;
+	margin: 0;
+	padding: 20px;
+}
+
+/* --- Table --- */
+table {
+	width: 100%;
+	border-collapse: collapse;
+	background-color: #252526;
+	border: 1px solid #333;
+}
+
+th {
+	background-color: #2d2d2d;
+	color: #fff;
+	font-weight: bold;
+	border-bottom: 1px solid #444;
+  padding: 10px;
+  text-align: left;
+}
+
+td {
+	padding: 10px;
+	border-bottom: 1px solid #333;
+	color: #ddd;
+}
+
+/* hover highlight */
+tr:hover td {
+	background-color: #2f2f2f;
+}
+
+/* --- Text Utility Classes expected by JS --- */
+.greyText {
+	color: #888;
+}
+
+.blueText {
+	color: #4aa8ff;
+}
+
+.greenText{
+  color: #78bb6a;
+}
+
+.redText{
+  color: #ea6161;
+}
+
+.smallText{
+  font-size: 12px;
+}
+
+.deepOrangeText {
+	color: #ff8f3f;
+}
+
+/* spacing wrapper */
+.tabcontent {
+	padding: 10px 0;
+}
+
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+	width: 10px;
+	height: 10px;
+	background: #1e1e1e;
+}
+
+::-webkit-scrollbar-track {
+	background: #1e1e1e;
+	border-left: 1px solid #2a2a2a;
+}
+
+::-webkit-scrollbar-thumb {
+	background: #3a3a3a;
+	border-radius: 6px;
+	border: 2px solid #1e1e1e;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: #505050;
+}
+
+/* unvisited link */
+a:link {
+  color: white;
+}
+
+/* visited link */
+a:visited {
+  color: #888;
+}
+
+/* Firefox */
+* {
+	scrollbar-width: thin;
+	scrollbar-color: #3a3a3a #1e1e1e;
+}
+
 </style>
+
 </head>
 <body>
 
-<div id="London" class="tabcontent">
-  <h3>London</h3>
-  <p>London is the capital of England.</p>
+<div class="tabcontent">
+	<table id="dataTable">
+		<tr>
+			<th>Item</th>
+			<th>Low | High</th>
+			<th>Profit</th>
+			<th>Cost</th>
+      <th>Links</th>
+		</tr>
+	</table>
 </div>
 
-<script>
-    window.beans = beans
-    function beans(){console.log("Bean me up")}
+<script src="../scripts/libraryFunctions.js"></script>
 
-    window.addEventListener('message', receiver, false);
-    function receiver(e) {
-    console.log(e)
-    beans()
+<script>
+window.addEventListener("message", receiver, false);
+
+function receiver(e) {
+	refreshData(e.data);
+}
+
+function refreshData(data) {
+	clearTable();
+	updateTable(data);
+
+  return true
+}
+
+function clearTable() {
+	var table = document.getElementById("dataTable");
+	for (var i = table.rows.length - 1; i > 0; i--) {
+		table.deleteRow(i);
+	}
+}
+
+function updateTable(data) {
+	let results = [];
+	var table = document.getElementById("dataTable");
+
+
+  let inputData = [];
+  let j = 0;
+
+  data.sortableData.sort(function(a, b){return Number(b.profitPotential) - Number(a.profitPotential);})
+
+  while(results.length < 50)
+  {
+    if(data.consolidatedData[data.sortableData[j].id].quantityData != null)
+    {
+      if(data.consolidatedData[data.sortableData[j].id].quantityData.highPriceVolume != 0 
+      && data.consolidatedData[data.sortableData[j].id].quantityData.lowPriceVolume != 0)
+      {
+		var id = data.sortableData[j].id
+        results.push(data.consolidatedData[id]);
+      }
     }
+    j++;
+  }
+
+	results = results.sort((a, b) => b.calcData.profitPotential - a.calcData.profitPotential);
+
+	for (var i = 0; i < results.length; i++) {
+		var row = results[i];
+		var tableRow = table.insertRow(i + 1);
+
+		var itemCell = tableRow.insertCell(0);
+		var lowHighCell = tableRow.insertCell(1);
+		var profitCell = tableRow.insertCell(2);
+		var costCell = tableRow.insertCell(3);
+		var linksCell = tableRow.insertCell(4);
+		var styleToUse = "";
+
+		itemCell.innerHTML =
+			row.itemData.name +
+			"<br><span class='greyText smallText'>" +
+			window.OSRS.library.numberWithCommas(row.itemData.limit) +
+			" | Max: " +
+			window.OSRS.library.numberWithCommas(row.calcData.guideBuy) +
+			"</span>";
+
+		lowHighCell.innerHTML =
+			"<span class='deepOrangeText'>" +
+			window.OSRS.library.numberWithCommas(row.priceData.low) +
+			"</span> | <span class='blueText'>" +
+			window.OSRS.library.numberWithCommas(row.priceData.high) +
+			"</span> | <span class='greyText'>" +
+			row.calcData.buySellRatio +
+			"</span>" +
+      "<br><span class='smallText'>" +
+      row.calcData.tax;
+      "</span>";
+
+    if(row.calcData.profit > 0)
+    {
+      styleToUse = "<span class='greenText'>"
+    }
+    else
+    {
+      styleToUse = "<span class='redText'>"
+    }
+		profitCell.innerHTML =
+      styleToUse + 
+			row.calcData.profitText +
+			" per<br><span class='smallText'>" +
+			row.calcData.profitPotentialText +
+      "</span></span>";
+
+		costCell.innerHTML =
+      styleToUse +
+			window.OSRS.library.numberWithCommas(row.calcData.totalCost) +
+			"<br><span class='smallText'>" +
+			window.OSRS.library.numberWithCommas(row.calcData.totalCostMillion) +
+			"m</span>"+
+      "</span>";
+    linksCell.innerHTML = 
+    "<a href='https://www.ge-tracker.com/item/" + row.calcData.geTrackerId +
+    "' target=\"_blank\" >GE Tracker</a><br>"+
+    "<a href='https://oldschool.runescape.wiki/w/" + row.calcData.wikiId +
+    "' target=\"_blank\" >Wiki</a><br>"
+	}
+}
 </script>
+
 </body>
-</html> 
+</html>
