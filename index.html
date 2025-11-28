@@ -93,7 +93,7 @@ iframe {
 <div class="loader" id="loader"></div>
 
 <div class="tab" id="tab" style="display:none;">
-	<button class="tablinks" onclick="openPage(event, 'HighAlchFlips')">HA Flips</button>
+	<button class="tablinks" id="haButton" onclick="openPage(event, 'HighAlchFlips')">HA Flips</button>
 	<button class="tablinks" onclick="openPage(event, 'HighAlch')">HA</button>
 	<button class="tablinks" onclick="openPage(event, 'Sets')">Sets</button>
 	<button class="tablinks" onclick="openPage(event, 'Components')">Components</button>
@@ -135,11 +135,24 @@ iframe {
 <script src="scripts/dataLoader.js"></script>
 
 <script>
-refreshData().then(() => {
-	document.getElementById('highAlchFlips')
-		.contentWindow.postMessage(window.OSRS.data, "*");
-	showPage()
-});
+
+window.addEventListener("DOMContentLoaded", (event) => { 
+    refreshData().then(() => {
+        console.log("SENDING")
+        postDataToPages().then(() => {
+            console.log("SENT")
+            showPage()
+            document.getElementById("haButton").click()
+        })
+    });
+})
+
+
+
+async function postDataToPages()
+{
+    document.getElementById('highAlchFlips').contentWindow.postMessage(window.OSRS.data, "*");
+}
 
 function showPage() {
 	document.getElementById("loader").style.display = "none";

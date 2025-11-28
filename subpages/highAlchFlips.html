@@ -2,97 +2,183 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
-body {font-family: Arial;}
-table {
-  font-family: arial, sans-serif;
-  border-collapse: collapse;
-  width: 100%;
+/* --- Base Theme --- */
+body {
+	background-color: #1e1e1e;
+	color: #e0e0e0;
+	font-family: Arial, sans-serif;
+	margin: 0;
+	padding: 20px;
 }
 
-td, th {
-  border: 1px solid #dddddd;
+/* --- Table --- */
+table {
+	width: 100%;
+	border-collapse: collapse;
+	background-color: #252526;
+	border: 1px solid #333;
+}
+
+th {
+	background-color: #2d2d2d;
+	color: #fff;
+	font-weight: bold;
+	border-bottom: 1px solid #444;
+  padding: 10px;
   text-align: left;
-  padding: 8px;
+}
+
+td {
+	padding: 10px;
+	border-bottom: 1px solid #333;
+	color: #ddd;
+}
+
+/* hover highlight */
+tr:hover td {
+	background-color: #2f2f2f;
+}
+
+/* --- Text Utility Classes expected by JS --- */
+.greyText {
+	color: #888;
+}
+
+.blueText {
+	color: #4aa8ff;
+	font-weight: bold;
+}
+
+.greenText{
+  color: #78bb6a;
+}
+
+.redText{
+  color: #ea6161;
+}
+
+.smallText{
+  font-size: 12px;
+}
+
+.deepOrangeText {
+	color: #ff8f3f;
+	font-weight: bold;
+}
+
+/* spacing wrapper */
+.tabcontent {
+	padding: 10px 0;
 }
 </style>
+
 </head>
 <body>
 
 <div class="tabcontent">
-  <table id="dataTable">
-  <tr>
-    <th>Item</th>
-    <th>Low | High</th>
-    <th>Profit</th>
-    <th>Cost</th>
-  </tr>
+	<table id="dataTable">
+		<tr>
+			<th>Item</th>
+			<th>Low | High</th>
+			<th>Profit</th>
+			<th>Cost</th>
+		</tr>
+	</table>
 </div>
 
 <script src="../scripts/libraryFunctions.js"></script>
+
 <script>
-  console.log("ATTACHED")
-    window.addEventListener('message', receiver, false);
+console.log("ATTACHED");
+window.addEventListener("message", receiver, false);
 
-    function receiver(e) 
+function receiver(e) {
+	console.log("RECEIVED");
+	console.log(e);
+	refreshData(e.data);
+}
+
+function refreshData(data) {
+	clearTable();
+	updateTable(data);
+
+  return true
+}
+
+function clearTable() {
+	var table = document.getElementById("dataTable");
+	for (var i = table.rows.length - 1; i > 0; i--) {
+		table.deleteRow(i);
+	}
+}
+
+function updateTable(data) {
+	let results = [];
+	var table = document.getElementById("dataTable");
+
+	for (var key in data.metaData.highAlchItems) {
+		var resultId = data.metaData.highAlchItems[key];
+		var result = data.consolidatedData[resultId];
+		result = window.OSRS.library.parseTypeName(result);
+		results.push(result);
+	}
+
+	results = results.sort((a, b) => b.calcData.profitPotential - a.calcData.profitPotential);
+
+	for (var i = 0; i < results.length; i++) {
+		var row = results[i];
+		var tableRow = table.insertRow(i + 1);
+
+		var itemCell = tableRow.insertCell(0);
+		var lowHighCell = tableRow.insertCell(1);
+		var profitCell = tableRow.insertCell(2);
+		var costCell = tableRow.insertCell(3);
+    var styleToUse = "";
+
+		itemCell.innerHTML =
+			row.itemData.name +
+			"<br><span class='greyText smallText'>" +
+			window.OSRS.library.numberWithCommas(row.itemData.limit) +
+			" | Max: " +
+			window.OSRS.library.numberWithCommas(row.calcData.guideBuy) +
+			"</span>";
+
+		lowHighCell.innerHTML =
+			"<span class='deepOrangeText'>" +
+			window.OSRS.library.numberWithCommas(row.priceData.low) +
+			"</span> | <span class='blueText'>" +
+			window.OSRS.library.numberWithCommas(row.priceData.high) +
+			"</span> | <span class='greyText'>" +
+			row.calcData.buySellRatio +
+			"</span>";
+
+    if(row.calcData.profit > 0)
     {
-      console.log("RECEIVED")
-      console.log(e)
-      refreshData(e.data)
+      styleToUse = "<span class='greenText'>"
     }
-
-
-  function refreshData(data)
-  {
-    clearTable()
-    updateTable(data)
-  }
-
-  function clearTable()
-  {
-    var table = document.getElementById("dataTable");
-
-    for(var i = table.rows.length - 1; i > 0; i--)
+    else
     {
-        table.deleteRow(i);
+      styleToUse = "<span class='redText'>"
     }
-  }
+		profitCell.innerHTML =
+      styleToUse + 
+			row.calcData.profitText +
+			" per<br>" +
+			row.calcData.profitPotentialText +
+      "</span>";
 
-  function updateTable(data)
-  {
-    	let results = [];
-      var table = document.getElementById("dataTable");
-
-      for(var key in data.metaData.highAlchItems)
-      {
-        var result = {};
-        var resultId = data.metaData.highAlchItems[key];
-        result = data.consolidatedData[resultId];
-        result = window.OSRS.library.parseTypeName(result);
-        results.push(result);
-      }
-
-      results = results.sort(function(a, b){return b.calcData.profitPotential - a.calcData.profitPotential;})
-
-      console.log(results)
-
-      for(var i = 0; i < results.length; i++)
-      {
-        var row = results[i]
-        var tableRow = table.insertRow(i+1);
-
-        var itemCell = tableRow.insertCell(0);
-        var lowHighCell = tableRow.insertCell(1);
-        var profitCell = tableRow.insertCell(2);
-        var costCell = tableRow.insertCell(3);
-
-        itemCell.innerHTML = row.itemData.name + "<br><span class=\"greyText\">" + window.OSRS.library.numberWithCommas(row.itemData.limit) + " | Max: " + window.OSRS.library.numberWithCommas(row.calcData.guideBuy) + "</span>"
-        lowHighCell.innerHTML = ("<span class=\"deepOrangeText\">" + window.OSRS.library.numberWithCommas(row.priceData.low) + "</span> | <span class=\"blueText\">" + window.OSRS.library.numberWithCommas(row.priceData.high) + "</span> | <span class=\"greyText\">" + row.calcData.buySellRatio + "</span>")
-        profitCell.innerHTML = (row.calcData.profitText + " per</span><br>" + row.calcData.profitPotentialText)
-        costCell.innerHTML = window.OSRS.library.numberWithCommas(row.calcData.totalCost) + "<br><span class=\"greyText\">" + window.OSRS.library.numberWithCommas(row.calcData.totalCostMillion) + "m</span>"
-      }
-
-  }
+		costCell.innerHTML =
+      styleToUse +
+			window.OSRS.library.numberWithCommas(row.calcData.totalCost) +
+			"<br><span class='smallText'>" +
+			window.OSRS.library.numberWithCommas(row.calcData.totalCostMillion) +
+			"m</span>"+
+      "</span>";
+	}
+}
 </script>
+
 </body>
-</html> 
+</html>
