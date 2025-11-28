@@ -129,6 +129,7 @@ iframe {
 	<button class="tablinks" onclick="openPage(event, 'Favourites')">Favourites</button>
 	<button class="tablinks" onclick="openPage(event, 'Profit')">Profit</button>
 	<button class="tablinks" onclick="openPage(event, 'Margin')">Margin</button>
+    <button class="tablinks" onclick="refreshPages()">Refresh</button>
 </div>
 
 <!-- ===== Tab Content ===== -->
@@ -138,7 +139,7 @@ iframe {
  
 
 <div id="Sets" class="tabcontent">
-	<iframe src="subpages/highAlchFlips.html" id="sets"></iframe>
+	<iframe src="subpages/sets.html" id="sets"></iframe>
 </div>
 
 <div id="Components" class="tabcontent">
@@ -157,12 +158,12 @@ iframe {
 	<iframe src="subpages/highAlchFlips.html" id="margin"></iframe>
 </div>
 
-
-
 <script src="scripts/libraryFunctions.js"></script>
 <script src="scripts/dataLoader.js"></script>
 
 <script>
+
+var intervalCode = null;
 
 window.addEventListener("DOMContentLoaded", async () => {
 	await refreshData();           // Wait for data loader
@@ -171,9 +172,14 @@ window.addEventListener("DOMContentLoaded", async () => {
 
 	showPage();
 	document.getElementById("haButton").click();
+    intervalCode = setInterval(refreshPages, 60000)
 });
 
-
+async function refreshPages()
+{
+	await refreshData();           // Wait for data loader
+	await postDataToPages();       // Now safe to message iframes
+}
 
 async function postDataToPages() {
 	const data = window.OSRS.data;

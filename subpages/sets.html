@@ -2,26 +2,264 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
-body {font-family: Arial;}
+/* --- Base Theme --- */
+body {
+	background-color: #1e1e1e;
+	color: #e0e0e0;
+	font-family: Arial, sans-serif;
+	margin: 0;
+	padding: 20px;
+}
+
+/* --- Table --- */
+table {
+	width: 100%;
+	border-collapse: collapse;
+	background-color: #252526;
+	border: 1px solid #333;
+}
+
+th {
+	background-color: #2d2d2d;
+	color: #fff;
+	font-weight: bold;
+	border-bottom: 1px solid #444;
+  padding: 10px;
+  text-align: left;
+}
+
+td {
+	padding: 10px;
+	border-bottom: 1px solid #333;
+	color: #ddd;
+}
+
+/* hover highlight */
+tr:hover td {
+	background-color: #2f2f2f;
+}
+
+/* --- Text Utility Classes expected by JS --- */
+.greyText {
+	color: #888;
+}
+
+.blueText {
+	color: #4aa8ff;
+	font-weight: bold;
+}
+
+.greenText{
+  color: #78bb6a;
+}
+
+.redText{
+  color: #ea6161;
+}
+
+.smallText{
+  font-size: 12px;
+}
+
+.deepOrangeText {
+	color: #ff8f3f;
+	font-weight: bold;
+}
+
+/* spacing wrapper */
+.tabcontent {
+	padding: 10px 0;
+}
+
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+	width: 10px;
+	height: 10px;
+	background: #1e1e1e;
+}
+
+::-webkit-scrollbar-track {
+	background: #1e1e1e;
+	border-left: 1px solid #2a2a2a;
+}
+
+::-webkit-scrollbar-thumb {
+	background: #3a3a3a;
+	border-radius: 6px;
+	border: 2px solid #1e1e1e;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: #505050;
+}
+
+/* Firefox */
+* {
+	scrollbar-width: thin;
+	scrollbar-color: #3a3a3a #1e1e1e;
+}
+
 </style>
+
 </head>
 <body>
 
-<div id="London" class="tabcontent">
-  <h3>London</h3>
-  <p>London is the capital of England.</p>
+<div class="tabcontent">
+	<table id="dataTable">
+		<tr>
+			<th>Name</th>
+			<th>Components</th>
+			<th>Profit</th>
+			<th>Cost</th>
+		</tr>
+	</table>
 </div>
 
-<script>
-    window.beans = beans
-    function beans(){console.log("Bean me up")}
+<script src="../scripts/libraryFunctions.js"></script>
 
-    window.addEventListener('message', receiver, false);
-    function receiver(e) {
-    console.log(e)
-    beans()
+<script>
+window.addEventListener("message", receiver, false);
+
+function receiver(e) {
+	refreshData(e.data);
+}
+
+function refreshData(data) {
+	clearTable();
+	updateTable(data);
+
+  return true
+}
+
+function clearTable() {
+	var table = document.getElementById("dataTable");
+	for (var i = table.rows.length - 1; i > 0; i--) {
+		table.deleteRow(i);
+	}
+}
+
+function updateTable(data) {
+	let results = [];
+	var table = document.getElementById("dataTable");
+
+for(var key in data.metaData.setItems)
+	{
+		var result = data.metaData.setItems[key];
+		result.data = data.consolidatedData[result.id];
+		result.data = window.OSRS.library.parseTypeName(result.data);
+		result.componentsData = [];
+
+		for(var i = 0; i < result.components.length; i++)
+		{
+		  result.componentsData.push(window.OSRS.library.parseTypeName(data.consolidatedData[result.components[i]]));
+		}
+
+		result.calcData = {};
+		result.calcData.componentCost = 0;
+		result.calcData.componentCostMax = 0;
+		result.calcData.lowestLimit = null;
+		for(var j = 0; j < result.componentsData.length; j++)
+		{
+			result.calcData.componentCost += result.componentsData[j].priceData.low;
+			result.calcData.componentCostMax += result.componentsData[j].priceData.high;
+			if(result.calcData.lowestLimit== null)
+			{
+				result.calcData.lowestLimit = result.componentsData[j].itemData.limit;
+			}
+			else if(result.calcData.lowestLimit > result.componentsData[j].itemData.limit)
+			{
+				result.calcData.lowestLimit = result.componentsData[j].itemData.limit;
+			}
+		}
+		result.calcData.profit = result.data.priceData.high;
+		result.calcData.profit = result.calcData.profit - (Math.floor(result.calcData.profit * 0.01));
+		result.calcData.profit = result.calcData.profit - result.calcData.componentCost;
+		result.calcData.profitTotal = result.calcData.profit * result.calcData.lowestLimit;
+		result.calcData.profitMin = result.data.priceData.low;
+		result.calcData.profitMin = result.calcData.profitMin - (Math.floor(result.calcData.profitMin * 0.01));
+		result.calcData.profitMin = result.calcData.profitMin - result.calcData.componentCostMax;
+		result.calcData.profitMinTotal = result.calcData.profitMin * result.calcData.lowestLimit;
+		result.calcData.componentCostTotal = result.calcData.componentCost * result.calcData.lowestLimit;
+		results.push(result);
+	}
+
+	results = results.sort((a, b) => b.calcData.profitPotential - a.calcData.profitPotential);
+
+	for (var i = 0; i < results.length; i++) {
+		var row = results[i];
+		var tableRow = table.insertRow(i + 1);
+
+		var nameCell = tableRow.insertCell(0);
+		var componetsCell = tableRow.insertCell(1);
+		var profitCell = tableRow.insertCell(2);
+		var costCell = tableRow.insertCell(3);
+    var styleToUse = "";
+    var styleToUseMin = "";
+
+		nameCell.innerHTML =
+		row.data.itemData.name + "<br><span class=\"deepOrangeText\">" + window.OSRS.library.numberWithCommas(row.data.priceData.low) + 
+		"</span> | <span class=\"blueText\">" + window.OSRS.library.numberWithCommas(row.data.priceData.high) + "</span><br>" +
+		"<span class=\"greyText smallText\">" + (window.OSRS.library.numberWithCommas(row.data.quantityData.highPriceVolume) || 0) + " | " + 
+		(window.OSRS.library.numberWithCommas(row.data.quantityData.lowPriceVolume) || 0) + " | " + 
+		window.OSRS.library.numberWithCommas(row.data.calcData.buySellRatio) + "</span>";
+
+		componetsCell.innerHTML = generateComponentString(row)
+
+    if(row.calcData.profit > 0)
+    {
+      styleToUse = "<span class='greenText'>"
     }
+    else
+    {
+      styleToUse = "<span class='redText'>"
+    }
+
+    if(row.calcData.profitMin > 0)
+    {
+      styleToUseMin = "<span class='greenText'>"
+    }
+    else
+    {
+      styleToUseMin = "<span class='redText'>"
+    }
+
+
+		profitCell.innerHTML =
+      styleToUse + "Max " + window.OSRS.library.formatAboveBelowZero(row.calcData.profit)  + " per</span><br>" +
+      window.OSRS.library.formatAboveBelowZero(((row.calcData.profitTotal)/1000000).toFixed(2)) + "m</span></span><br><br>"+
+       styleToUseMin + "Min " + window.OSRS.library.formatAboveBelowZero(row.calcData.profitMin)  + " per</span><br>" +
+      window.OSRS.library.formatAboveBelowZero(((row.calcData.profitMinTotal)/1000000).toFixed(2)) + "m</span></span>"
+
+		costCell.innerHTML =
+      window.OSRS.library.numberWithCommas(row.calcData.componentCost) + " per<br><span class=\"greyText smallText\">" + window.OSRS.library.numberWithCommas((row.calcData.componentCostTotal/1000000).toFixed(2)) + "m<br>"
+		 + window.OSRS.library.numberWithCommas(row.calcData.lowestLimit) + " limit</span>"
+	}
+
+
+function generateComponentString(row)
+{
+	let componentString = "";
+
+	for(var i = 0; i < row.componentsData.length; i++)
+	{
+		componentString += row.componentsData[i].itemData.name;
+		componentString += "<br>";
+		componentString += ("<span class= 'smallText'> <span class=\"deepOrangeText\">" + window.OSRS.library.numberWithCommas(row.componentsData[i].priceData.low) + "</span> | <span class=\"blueText\">" + window.OSRS.library.numberWithCommas(row.componentsData[i].priceData.high) + "</span>");
+		componentString += " | <span class=\"greyText\">" + row.componentsData[i].calcData.buySellRatio + "</span></span>";
+		if(i+1 != row.componentsData.length)
+		{
+			componentString += "<br>";
+		}
+		
+	}
+
+	return componentString;
+
+}
+}
 </script>
+
 </body>
-</html> 
+</html>

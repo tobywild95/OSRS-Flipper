@@ -18,6 +18,8 @@ async function refreshData()
 	//window.OSRS.data.consolidatedData = consolidatedData;
 	window.OSRS.data.sortableData = sortableData;
 
+	console.log(window.OSRS.data)
+
 	return true
 }
 
@@ -131,8 +133,6 @@ function consolidateData(priceResponse, itemResponse, quantityResponse, natureRu
 
 	window.OSRS.data.consolidatedData = consolidatedData
 
-	console.log("sortableData", sortableData);
-
 	return sortableData
 }
 
@@ -140,17 +140,19 @@ function getCalculatedData(result, natureRune)
 {
 	let calcData = {};
 	calcData.guideBuy = result.itemData.highalch - natureRune.priceData.high;
-	calcData.guideBuy = calcData.guideBuy - (Math.floor(calcData.guideBuy * 0.01));
+	calcData.guideBuy = calcData.guideBuy - (Math.floor(calcData.guideBuy * 0.02));
 
 	calcData.profit = result.priceData.high - result.priceData.low;
 
 	if(result.itemData.id == 13190)
 	{
-		calcData.profit = calcData.profit - (Math.floor(result.priceData.high * 0.1));
+		calcData.tax = Math.floor(result.priceData.high * 0.1);
+		calcData.profit = calcData.profit - calcData.tax;
 	}
 	else
 	{
-		calcData.profit = calcData.profit - (Math.floor(result.priceData.high * 0.01));
+		calcData.tax = Math.floor(result.priceData.high * 0.02);
+		calcData.profit = calcData.profit - calcData.tax;
 	}
 	
 	calcData.profitText = window.OSRS.library.formatAboveBelowZero(calcData.profit)

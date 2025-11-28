@@ -120,12 +120,9 @@ tr:hover td {
 <script src="../scripts/libraryFunctions.js"></script>
 
 <script>
-console.log("ATTACHED");
 window.addEventListener("message", receiver, false);
 
 function receiver(e) {
-	console.log("RECEIVED");
-	console.log(e);
 	refreshData(e.data);
 }
 
@@ -194,9 +191,9 @@ function updateTable(data) {
 		profitCell.innerHTML =
       styleToUse + 
 			row.calcData.profitText +
-			" per<br>" +
+			" per<br><span class='smallText'>" +
 			row.calcData.profitPotentialText +
-      "</span>";
+      "</span></span>";
 
 		costCell.innerHTML =
       styleToUse +
