@@ -180,6 +180,7 @@ for(var key in data.metaData.plantPots)
 		result.calcData.profitMin = result.calcData.profitMin - result.calcData.componentCostMax;
 		result.calcData.profitMinTotal = result.calcData.profitMin * result.calcData.lowestLimit;
 		result.calcData.componentCostTotal = result.calcData.componentCost * result.calcData.lowestLimit;
+		result.name = key;
 		results.push(result);
 	}
 
@@ -197,7 +198,7 @@ for(var key in data.metaData.plantPots)
     var styleToUseMin = "";
 
 		nameCell.innerHTML =
-		row.data.itemData.name + "<br><span class=\"deepOrangeText\">" + window.OSRS.library.numberWithCommas(row.data.priceData.low) + 
+		row.name + "<br><span class=\"deepOrangeText\">" + window.OSRS.library.numberWithCommas(row.data.priceData.low) + 
 		"</span> | <span class=\"blueText\">" + window.OSRS.library.numberWithCommas(row.data.priceData.high) + "</span><br>" +
 		"<span class=\"greyText smallText\">" + (window.OSRS.library.numberWithCommas(row.data.quantityData.highPriceVolume) || 0) + " | " + 
 		(window.OSRS.library.numberWithCommas(row.data.quantityData.lowPriceVolume) || 0) + " | " + 
