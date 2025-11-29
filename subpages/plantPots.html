@@ -24,10 +24,10 @@ table {
 th {
 	background-color: #2d2d2d;
 	color: #fff;
+	font-weight: bold;
 	border-bottom: 1px solid #444;
   padding: 10px;
   text-align: left;
-  font-weight: bold;
 }
 
 td {
@@ -142,9 +142,9 @@ function updateTable(data) {
 	let results = [];
 	var table = document.getElementById("dataTable");
 
-for(var key in data.metaData.combineItems)
+for(var key in data.metaData.plantPots)
 	{
-		var result = data.metaData.combineItems[key];
+		var result = data.metaData.plantPots[key];
 		result.data = data.consolidatedData[result.id];
 		result.data = window.OSRS.library.parseTypeName(result.data);
 		result.componentsData = [];

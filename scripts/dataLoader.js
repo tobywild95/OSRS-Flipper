@@ -27,10 +27,75 @@ function getMetaData()
 {
 	let metaData = {
     natureRuneId: 561,
-    highAlchItems: {"Maple longbow":851,"Sapphire necklace":1656,"Emerald necklace":1658,"Rune arrow":892,"Runite bolts":9144,"Yew longbow":855,"Yew shortbow":857,"Amethyst arrow":21326,"Atlatl dart":28991,"Magic shortbow":861,"Magic longbow":859,"Diamond bracelet":11092,"Jade bracelet":21120,"Rune dart":811,"Diamond bolts (e)":9243},
-    setItems: {"Ahrim's armour set":{"id":12881,"components":[4708,4712,4714,4710]},"Dharok's armour set":{"id":12877,"components":[4718,4716,4720,4722]},"Dwarf cannon set":{"id":12863,"components":[10,6,12,8]}},
-    combineItems: {"Bandos godsword":{"id":11804,"components":[11812,11798]},"Saradomin godsword":{"id":11806,"components":[11814,11798]},"Zamorak godsword":{"id":11808,"components":[11816,11798]},"Ancient godsword":{"id":26233,"components":[26370,11798]},"Armadyl godsword":{"id":11802,"components":[11810,11798]},"Burning claws":{"id":29577,"components":[29574,29574]},"Voidwaker":{"id":27690,"components":[27684,27687,27681]}},
-    favouriteItems: {"Amulet of fury":6585,"Chaos rune":562,"Ranarr seed":5295,"Ranarr weed":257,"Snape grass seed":22879,"Kwuarm seed":5299,"Adamant arrow":890,"Gold ore":444,"Law rune":563,"Berserker necklace":11128,"Berserker ring":6737,"Archer helm":3749,"Adamant dart":810,"Dark crab":11936,"Black chinchompa":11959,"Mahogany logs":6332}
+    highAlchItems: {
+		"Maple longbow":851,
+		"Sapphire necklace":1656,
+		"Emerald necklace":1658,
+		"Rune arrow":892,
+		"Runite bolts":9144,
+		"Yew longbow":855,
+		"Yew shortbow":857,
+		"Amethyst arrow":21326,
+		"Atlatl dart":28991,
+		"Magic shortbow":861,
+		"Magic longbow":859,
+		"Diamond bracelet":11092,
+		"Jade bracelet":21120,
+		"Rune dart":811,
+		"Diamond bolts (e)":9243
+	},
+    setItems: {
+		"Ahrim's armour set":{"id":12881,"components":[4708,4712,4714,4710]},
+		"Dharok's armour set":{"id":12877,"components":[4718,4716,4720,4722]},
+		"Dwarf cannon set":{"id":12863,"components":[10,6,12,8]}
+	},
+    combineItems: {
+		"Bandos godsword":{"id":11804,"components":[11812,11798]},
+		"Saradomin godsword":{"id":11806,"components":[11814,11798]},
+		"Zamorak godsword":{"id":11808,"components":[11816,11798]},
+		"Ancient godsword":{"id":26233,"components":[26370,11798]},
+		"Armadyl godsword":{"id":11802,"components":[11810,11798]},
+		"Burning claws":{"id":29577,"components":[29574,29574]},
+		"Voidwaker":{"id":27690,"components":[27684,27687,27681]}
+	},
+    favouriteItems: {
+		"Amulet of fury":6585,
+		"Chaos rune":562,
+		"Ranarr seed":5295,
+		"Ranarr weed":257,
+		"Snape grass seed":22879,
+		"Kwuarm seed":5299,
+		"Adamant arrow":890,
+		"Gold ore":444,
+		"Law rune":563,
+		"Berserker necklace":11128,
+		"Berserker ring":6737,
+		"Archer helm":3749,
+		"Adamant dart":810,
+		"Dark crab":11936,
+		"Black chinchompa":11959,
+		"Mahogany logs":6332
+	},
+	plantPots:{
+		"Celastrus sapling":{"id":22856,"components":[22869, 5354]},
+		"Maple sapling":{"id":5372,"components":[5314, 5354]},
+		"Redwood  sapling":{"id":22859,"components":[22871, 5354]},
+		"Magic sapling":{"id":5374,"components":[5316, 5354]},
+		"Papaya sapling":{"id":5501,"components":[5288, 5354]},
+		"Yew sapling":{"id":5373,"components":[5315, 5354]},
+		"Calquat sapling":{"id":5503,"components":[5290, 5354]},
+		"Willow sapling":{"id":5371,"components":[5313, 5354]},
+		"Mahogany sapling":{"id":21480,"components":[21488, 5354]},
+		"Oak sapling":{"id":5370,"components":[5312, 5354]},
+		"Banana sapling":{"id":5497,"components":[5284, 5354]},
+		"Teak sapling":{"id":21477,"components":[21486, 5354]},
+		"Orange sapling":{"id":5498,"components":[5285, 5354]},
+		"Palm sapling":{"id":5502,"components":[5289, 5354]},
+		"Curry sapling":{"id":5499,"components":[5286, 5354]},
+		"Apple sapling":{"id":5496,"components":[5283, 5354]},
+		"Pineapple sapling":{"id":5500,"components":[5287, 5354]},
+		"Dragonfruit sapling":{"id":22866,"components":[22877, 5354]}
+	}
   };
 
 	return metaData;
