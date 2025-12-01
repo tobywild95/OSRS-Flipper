@@ -47,6 +47,12 @@ function getMetaData()
     setItems: {
 		"Ahrim's armour set":{"id":12881,"components":[4708,4712,4714,4710]},
 		"Dharok's armour set":{"id":12877,"components":[4718,4716,4720,4722]},
+		"Blue moon armour set":{"id":31139,"components":[29019,28988,29016,29013]},
+		"Blood moon armour set":{"id":31136,"components":[28997,29028,29025,29022]},
+		"Eclipse moon armour set":{"id":31142,"components":[29010,29007,29004,29000]},
+		"Sunfire fanatic armour set":{"id":29424,"components":[28933,28936,28939]},
+		"Hueycoatl hide armour set":{"id":31169,"components":[30073,30076,30079,30082]},
+		"Torag's armour set":{"id":12879,"components":[4745,4747,4749,4751]},
 		"Dwarf cannon set":{"id":12863,"components":[10,6,12,8]}
 	},
     combineItems: {
