@@ -1,3 +1,4 @@
+<!-- ...existing code... -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,116 +7,202 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
+    /* header left + app icon + current tab */
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.appIcon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    object-fit: cover;
+}
+.currentTab {
+    color: #bbb;
+    font-weight: 500;
+    font-size: 14px;
+    margin-left: 6px;
+}
+
 /* ===== Base ===== */
 body {
-	font-family: Arial, sans-serif;
-	margin: 0;
-	padding: 0;
-	background-color: #1e1e1e;
-	color: #ddd;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #1e1e1e;
+    color: #ddd;
 }
 
-/* ===== Tabs ===== */
-.tab {
-	display: flex;
-	border-bottom: 1px solid #333;
-	background-color: #2b2b2b;
+/* ===== Header & Hamburger ===== */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background-color: #2b2b2b;
+    border-bottom: 1px solid #333;
+    position: relative;
+    z-index: 50;
 }
 
-.tab button {
-	background: none;
-	border: none;
-	outline: none;
-	cursor: pointer;
-	padding: 12px 18px;
-	font-size: 16px;
-	color: #bbb;
-	transition: background-color 0.2s, color 0.2s;
+.title {
+    color: #ddd;
+    font-size: 18px;
+    font-weight: 600;
 }
 
-.tab button:hover {
-	background-color: #3b3b3b;
-	color: #fff;
+.hamburger {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #bbb;
+    font-size: 20px;
+    transition: background-color 0.2s, color 0.2s;
 }
 
-.tab button.active {
-	background-color: #444;
-	color: #fff;
-	border-bottom: 2px solid #ea6161;
+.hamburger:hover {
+    background-color: #3b3b3b;
+    color: #fff;
+}
+
+/* ===== Side Menu ===== */
+.side-menu {
+    position: fixed;
+    top: 0;
+    left: -260px;
+    width: 260px;
+    height: 100%;
+    background-color: #222;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.6);
+    transition: left 0.24s ease;
+    padding-top: 60px;
+    z-index: 60;
+    overflow-y: auto;
+}
+
+.side-menu.open {
+    left: 0;
+}
+
+.side-menu .menuItem {
+    display: block;
+    padding: 12px 18px;
+    color: #ccc;
+    border-bottom: 1px solid #2b2b2b;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-size: 15px;
+    cursor: pointer;
+    outline: none;
+}
+
+.side-menu .menuItem:hover {
+    background-color: #333;
+    color: #fff;
+}
+
+.side-menu .menuItem.active {
+    background-color: #444;
+    color: #fff;
+    border-left: 4px solid #ea6161;
+}
+
+/* ===== Overlay ===== */
+.menu-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s;
+    z-index: 55;
+}
+
+.menu-overlay.open {
+    opacity: 1;
+    visibility: visible;
 }
 
 /* ===== Content Area ===== */
 .tabcontent {
-	display: none;
-	height: calc(100vh - 50px);
-	border-top: none;
-	background-color: #1e1e1e;
-	padding: 0;
+    display: none;
+    height: calc(100vh - 50px);
+    border-top: none;
+    background-color: #1e1e1e;
+    padding: 0;
 }
 
 /* ===== Iframe ===== */
 iframe {
-	margin: 0;
-	padding: 0;
-	border: none;
-	width: 100%;
-	height: 100%;
-	background: #1e1e1e;
+    margin: 0;
+    padding: 0;
+    border: none;
+    width: 100%;
+    height: 100%;
+    background: #1e1e1e;
 }
 
 /* ===== Loader ===== */
 .loader {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	display: inline-grid;
-	font-size: 200px;
-	color: #6da9ff;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: inline-grid;
+    font-size: 200px;
+    color: #6da9ff;
 }
 
 .loader:before,
 .loader:after {
-	content: "💰";
-	grid-area: 1/1;
+    content: "💰";
+    grid-area: 1/1;
 }
 
 .loader:after {
-	animation: l10 1s infinite;
+    animation: l10 1s infinite;
 }
 
 @keyframes l10 {
-	to { transform: scale(1.8); opacity: 0; }
+    to { transform: scale(1.8); opacity: 0; }
 }
 
 /* Chrome, Edge, Safari */
 ::-webkit-scrollbar {
-	width: 10px;
-	height: 10px;
-	background: #1e1e1e;
+    width: 10px;
+    height: 10px;
+    background: #1e1e1e;
 }
 
 ::-webkit-scrollbar-track {
-	background: #1e1e1e;
-	border-left: 1px solid #2a2a2a;
+    background: #1e1e1e;
+    border-left: 1px solid #2a2a2a;
 }
 
 ::-webkit-scrollbar-thumb {
-	background: #3a3a3a;
-	border-radius: 6px;
-	border: 2px solid #1e1e1e;
+    background: #3a3a3a;
+    border-radius: 6px;
+    border: 2px solid #1e1e1e;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-	background: #505050;
+    background: #505050;
 }
 
 /* Firefox */
 * {
-	scrollbar-width: thin;
-	scrollbar-color: #3a3a3a #1e1e1e;
+    scrollbar-width: thin;
+    scrollbar-color: #3a3a3a #1e1e1e;
 }
-
 
 </style>
 </head>
@@ -124,45 +211,59 @@ iframe {
 
 <div class="loader" id="loader"></div>
 
-<div class="tab" id="tab" style="display:none;">
-	<button class="tablinks" id="haButton" onclick="openPage(event, 'HighAlchFlips')">HA Flips</button>
-	<button class="tablinks" onclick="openPage(event, 'Sets')">Sets</button>
-	<button class="tablinks" onclick="openPage(event, 'Components')">Components</button>
-	<button class="tablinks" onclick="openPage(event, 'Favourites')">Favourites</button>
-	<button class="tablinks" onclick="openPage(event, 'Profit')">Profit</button>
-	<button class="tablinks" onclick="openPage(event, 'Margin')">Margin</button>
-	<button class="tablinks" onclick="openPage(event, 'PlantPots')">Plant pots</button>
-    <button class="tablinks" onclick="refreshPages()">Refresh</button>
+<div class="header" id="header" style="display:none;">
+    <div class="header-left">
+        <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">☰</button>
+        <img src="images/coins.png" alt="OSRS Flipper" class="appIcon">
+        <div class="title">OSRS Flipper<span id="currentTab" class="currentTab"></span></div>
+    </div>
+
+    <!-- refresh button (styled like hamburger) -->
+    <button class="hamburger" id="refreshBtn" aria-label="Refresh data">⟳</button>
 </div>
 
-<!-- ===== Tab Content ===== -->
+<!-- Side menu (hamburger) -->
+<nav class="side-menu" id="sideMenu" aria-hidden="true">
+    <button class="menuItem" data-page="HighAlchFlips">HA Flips</button>
+    <button class="menuItem" data-page="Sets">Sets</button>
+    <button class="menuItem" data-page="Components">Components</button>
+    <button class="menuItem" data-page="Favourites">Favourites</button>
+    <button class="menuItem" data-page="Profit">Profit</button>
+    <button class="menuItem" data-page="Margin">Margin</button>
+    <button class="menuItem" data-page="PlantPots">Plant pots</button>
+    <!-- refresh removed from menu -->
+</nav>
+
+<div class="menu-overlay" id="menuOverlay"></div>
+
+<!-- ===== Tab Content (iframes unchanged) ===== -->
 <div id="HighAlchFlips" class="tabcontent">
-	<iframe src="subpages/highAlchFlips.html" id="highAlchFlips" onload="resizeIframe(this)"></iframe>
+    <iframe src="subpages/highAlchFlips.html" id="highAlchFlips" onload="resizeIframe(this)"></iframe>
 </div>
  
 
 <div id="Sets" class="tabcontent">
-	<iframe src="subpages/sets.html" id="sets"></iframe>
+    <iframe src="subpages/sets.html" id="sets"></iframe>
 </div>
 
 <div id="Components" class="tabcontent">
-	<iframe src="subpages/components.html" id="components"></iframe>
+    <iframe src="subpages/components.html" id="components"></iframe>
 </div>
 
 <div id="Favourites" class="tabcontent">
-	<iframe src="subpages/favourites.html" id="favourites"></iframe>
+    <iframe src="subpages/favourites.html" id="favourites"></iframe>
 </div>
 
 <div id="Profit" class="tabcontent">
-	<iframe src="subpages/profit.html" id="profit"></iframe>
+    <iframe src="subpages/profit.html" id="profit"></iframe>
 </div>
 
 <div id="Margin" class="tabcontent">
-	<iframe src="subpages/margin.html" id="margin"></iframe>
+    <iframe src="subpages/margin.html" id="margin"></iframe>
 </div>
 
 <div id="PlantPots" class="tabcontent">
-	<iframe src="subpages/plantPots.html" id="plantPots"></iframe>
+    <iframe src="subpages/plantPots.html" id="plantPots"></iframe>
 </div>
 
 <script src="scripts/libraryFunctions.js"></script>
@@ -173,65 +274,116 @@ iframe {
 var intervalCode = null;
 
 window.addEventListener("DOMContentLoaded", async () => {
-	await refreshData();           // Wait for data loader
-	await waitForIframes();        // Wait for all subpages to load
-	await postDataToPages();       // Now safe to message iframes
+    await refreshData();           // Wait for data loader
+    await waitForIframes();        // Wait for all subpages to load
+    await postDataToPages();       // Now safe to message iframes
 
-	showPage();
-	document.getElementById("haButton").click();
+    showPage();
+    document.getElementById("hamburgerBtn").addEventListener("click", toggleMenu);
+    document.getElementById("menuOverlay").addEventListener("click", closeMenu);
+
+    // Wire up menu items
+    document.querySelectorAll(".menuItem").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            const page = btn.dataset.page;
+            if (page) openPage(null, page);
+            closeMenu();
+        });
+    });
+
+    // wire up top refresh button
+    document.getElementById("refreshBtn").addEventListener("click", async () => {
+        await refreshPages();
+    });
+
+    // Open default page
+    openPage(null, 'HighAlchFlips');
+
     intervalCode = setInterval(refreshPages, 60000)
 });
 
 async function refreshPages()
 {
-	await refreshData();           // Wait for data loader
-	await postDataToPages();       // Now safe to message iframes
+    await refreshData();           // Wait for data loader
+    await postDataToPages();       // Now safe to message iframes
 }
 
 async function postDataToPages() {
-	const data = window.OSRS.data;
-	document.querySelectorAll("iframe").forEach(frame => {
-		frame.contentWindow.postMessage(data, "*");
-	});
+    const data = window.OSRS.data;
+    document.querySelectorAll("iframe").forEach(frame => {
+        frame.contentWindow.postMessage(data, "*");
+    });
 }
 
 function showPage() {
-	document.getElementById("loader").style.display = "none";
-	document.getElementById("tab").style.display = "flex";
+    document.getElementById("loader").style.display = "none";
+    document.getElementById("header").style.display = "flex";
 }
 
 function resizeIframe(obj) {
-	obj.style.height = (window.innerHeight - 60) + "px";
+    obj.style.height = (window.innerHeight - 60) + "px";
 }
 
 function openPage(evt, pageName) {
-	let tabcontent = document.getElementsByClassName("tabcontent");
-	for (let i = 0; i < tabcontent.length; i++) {
-		tabcontent[i].style.display = "none";
-	}
+    // hide all pages
+    let tabcontent = document.getElementsByClassName("tabcontent");
+    for (let i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
 
-	let tablinks = document.getElementsByClassName("tablinks");
-	for (let i = 0; i < tablinks.length; i++) {
-		tablinks[i].className = tablinks[i].className.replace(" active", "");
-	}
+    // clear active on menu items
+    let menuItems = document.getElementsByClassName("menuItem");
+    for (let i = 0; i < menuItems.length; i++) {
+        menuItems[i].className = menuItems[i].className.replace(" active", "");
+    }
 
-	document.getElementById(pageName).style.display = "block";
-	evt.currentTarget.className += " active";
+    // show selected page
+    if (pageName) {
+        document.getElementById(pageName).style.display = "block";
+        // set active menu button if exists
+        const btn = document.querySelector('.menuItem[data-page="'+pageName+'"]');
+        if (btn) btn.className += " active";
+
+        // update header current tab and document title
+        const displayName = btn ? btn.textContent.trim() : pageName;
+        const currentTabEl = document.getElementById('currentTab');
+        if (currentTabEl) currentTabEl.textContent = displayName;
+        document.title = 'OSRS Flipper - ' + displayName;
+    }
 }
 
 function waitForIframes() {
-	const frames = Array.from(document.querySelectorAll("iframe"));
-	return Promise.all(
-		frames.map(frame => new Promise(resolve => {
-			if (frame.contentWindow && frame.contentDocument?.readyState === "complete") {
-				resolve();
-			} else {
-				frame.onload = () => resolve();
-			}
-		}))
-	);
+    const frames = Array.from(document.querySelectorAll("iframe"));
+    return Promise.all(
+        frames.map(frame => new Promise(resolve => {
+            if (frame.contentWindow && frame.contentDocument?.readyState === "complete") {
+                resolve();
+            } else {
+                frame.onload = () => resolve();
+            }
+        }))
+    );
 }
+
+/* ===== Menu controls ===== */
+function toggleMenu() {
+    const menu = document.getElementById('sideMenu');
+    const overlay = document.getElementById('menuOverlay');
+    const open = menu.classList.toggle('open');
+    menu.setAttribute('aria-hidden', open ? 'false' : 'true');
+    if (open) overlay.classList.add('open'); else overlay.classList.remove('open');
+}
+
+function closeMenu() {
+    const menu = document.getElementById('sideMenu');
+    const overlay = document.getElementById('menuOverlay');
+    menu.classList.remove('open');
+    menu.setAttribute('aria-hidden', 'true');
+    overlay.classList.remove('open');
+}
+
 </script>
 
 </body>
 </html>
+<!-- ...existing code... -->
