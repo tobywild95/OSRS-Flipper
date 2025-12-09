@@ -103,7 +103,16 @@ function getMetaData()
 		"Dragonfruit sapling (81)":{"id":22866,"components":[22877, 5354]},
 		"Camphor sapling (66)":{"id":31502,"components":[31547, 5354]},
 		"Ironwood sapling (80)":{"id":31505,"components":[31549, 5354]},
-		"Rosewood sapling (92)":{"id":31508,"components":[31551, 5354]}
+		"Rosewood sapling (92)":{"id":31508,"components":[31551, 5354]},
+		"Bird house (5)":{"id":21512,"components":[1511, 8792]},
+		"Oak bird house (15)":{"id":21515,"components":[1521, 8792]},
+		"Willow bird house (25)":{"id":21518,"components":[1519, 8792]},
+		"Teak bird house (35)":{"id":21521,"components":[6333, 8792]},
+		"Maple bird house (45)":{"id":22192,"components":[1517, 8792]},
+		"Mahogany bird house (50)":{"id":22195,"components":[6332, 8792]},
+		"Yew bird house (60)":{"id":22198,"components":[1515, 8792]},
+		"Magic bird house (75)":{"id":22201,"components":[1513, 8792]},
+		"Redwood bird house (90)":{"id":22204,"components":[19669, 8792]}
 	}
   };
 

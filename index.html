@@ -43,7 +43,11 @@ body {
     padding: 10px 14px;
     background-color: #2b2b2b;
     border-bottom: 1px solid #333;
-    position: relative;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
     z-index: 50;
 }
 
@@ -65,12 +69,33 @@ body {
     cursor: pointer;
     color: #bbb;
     font-size: 20px;
-    transition: background-color 0.2s, color 0.2s;
+    transition: background-color 0.18s ease, color 0.18s ease, transform 0.08s ease;
 }
 
+/* icon inside hamburger/refresh buttons */
+.hamburger img.icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    display: block;
+    transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+/* hover / focus / active for top buttons */
 .hamburger:hover {
-    background-color: #3b3b3b;
+    background-color: rgba(255,255,255,0.04);
     color: #fff;
+}
+.hamburger:focus {
+    outline: 2px solid #ea6161;
+    outline-offset: 2px;
+}
+.hamburger:active {
+    transform: translateY(1px);
+}
+.hamburger:hover img.icon {
+    transform: scale(1.05);
+    filter: brightness(1.15);
 }
 
 /* ===== Side Menu ===== */
@@ -92,6 +117,7 @@ body {
     left: 0;
 }
 
+/* smooth menu item transitions */
 .side-menu .menuItem {
     display: block;
     padding: 12px 18px;
@@ -103,6 +129,7 @@ body {
     font-size: 15px;
     cursor: pointer;
     outline: none;
+    transition: background-color 0.14s ease, color 0.14s ease, padding-left 0.12s ease;
 }
 
 .side-menu .menuItem:hover {
@@ -135,10 +162,16 @@ body {
 /* ===== Content Area ===== */
 .tabcontent {
     display: none;
-    height: calc(100vh - 50px);
-    border-top: none;
-    background-color: #1e1e1e;
-    padding: 0;
+    /* fixed to viewport beneath header so iframe viewport top === header bottom */
+    position: fixed;
+    top: 50px;   /* match header height */
+    left: 0;
+    right: 0;
+    bottom: 0;
+     border-top: none;
+     background-color: #1e1e1e;
+     padding: 0;
+     box-sizing: border-box;
 }
 
 /* ===== Iframe ===== */
@@ -146,9 +179,11 @@ iframe {
     margin: 0;
     padding: 0;
     border: none;
+    display: block;
     width: 100%;
-    height: 100%;
-    background: #1e1e1e;
+    height: calc(100vh - 50px); /* explicit viewport-relative height under header */
+     background: #1e1e1e;
+     overflow: auto;
 }
 
 /* ===== Loader ===== */
@@ -213,13 +248,17 @@ iframe {
 
 <div class="header" id="header" style="display:none;">
     <div class="header-left">
-        <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">☰</button>
+        <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
+            <img src="images/hamburger.png" alt="Open menu" class="icon">
+        </button>
         <img src="images/coins.png" alt="OSRS Flipper" class="appIcon">
         <div class="title">OSRS Flipper<span id="currentTab" class="currentTab"></span></div>
     </div>
 
     <!-- refresh button (styled like hamburger) -->
-    <button class="hamburger" id="refreshBtn" aria-label="Refresh data">⟳</button>
+    <button class="hamburger" id="refreshBtn" aria-label="Refresh data">
+        <img src="images/refresh.png" alt="Refresh data" class="icon">
+    </button>
 </div>
 
 <!-- Side menu (hamburger) -->
@@ -230,7 +269,7 @@ iframe {
     <button class="menuItem" data-page="Favourites">Favourites</button>
     <button class="menuItem" data-page="Profit">Profit</button>
     <button class="menuItem" data-page="Margin">Margin</button>
-    <button class="menuItem" data-page="PlantPots">Plant pots</button>
+    <button class="menuItem" data-page="Crafting">Crafting</button>
     <!-- refresh removed from menu -->
 </nav>
 
@@ -238,7 +277,7 @@ iframe {
 
 <!-- ===== Tab Content (iframes unchanged) ===== -->
 <div id="HighAlchFlips" class="tabcontent">
-    <iframe src="subpages/highAlchFlips.html" id="highAlchFlips" onload="resizeIframe(this)"></iframe>
+    <iframe src="subpages/highAlchFlips.html" id="highAlchFlips"></iframe>
 </div>
  
 
@@ -262,8 +301,8 @@ iframe {
     <iframe src="subpages/margin.html" id="margin"></iframe>
 </div>
 
-<div id="PlantPots" class="tabcontent">
-    <iframe src="subpages/plantPots.html" id="plantPots"></iframe>
+<div id="Crafting" class="tabcontent">
+    <iframe src="subpages/crafting.html" id="crafting"></iframe>
 </div>
 
 <script src="scripts/libraryFunctions.js"></script>
@@ -318,10 +357,6 @@ async function postDataToPages() {
 function showPage() {
     document.getElementById("loader").style.display = "none";
     document.getElementById("header").style.display = "flex";
-}
-
-function resizeIframe(obj) {
-    obj.style.height = (window.innerHeight - 60) + "px";
 }
 
 function openPage(evt, pageName) {

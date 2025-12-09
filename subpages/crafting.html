@@ -202,8 +202,15 @@ for(var key in data.metaData.plantPots)
 		var componetsCell = tableRow.insertCell(1);
 		var profitCell = tableRow.insertCell(2);
 		var costCell = tableRow.insertCell(3);
-    var styleToUse = "";
-    var styleToUseMin = "";
+		var styleToUse = "";
+		var styleToUseMin = "";
+
+			if(!row.data.quantityData)
+	{
+		row.data.quantityData = {}
+		row.data.quantityData.highPriceVolume = 0
+		row.data.quantityData.lowPriceVolume = 0
+	}
 
 		nameCell.innerHTML =
 		row.name + "<br><span class=\"deepOrangeText\">" + window.OSRS.library.numberWithCommas(row.data.priceData.low) + 

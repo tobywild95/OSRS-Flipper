@@ -204,6 +204,13 @@ for(var key in data.metaData.combineItems)
     var styleToUse = "";
     var styleToUseMin = "";
 
+		if(!row.data.quantityData)
+	{
+		row.data.quantityData = {}
+		row.data.quantityData.highPriceVolume = 0
+		row.data.quantityData.lowPriceVolume = 0
+	}
+
 		nameCell.innerHTML =
 		row.data.itemData.name + "<br><span class=\"deepOrangeText\">" + window.OSRS.library.numberWithCommas(row.data.priceData.low) + 
 		"</span> | <span class=\"blueText\">" + window.OSRS.library.numberWithCommas(row.data.priceData.high) + "</span><br>" +
